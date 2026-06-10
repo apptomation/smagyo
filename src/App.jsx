@@ -1,7 +1,20 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import { CartProvider } from "./context/CartContext";
+import { AdminAuthProvider } from "./admin/context/AdminAuthContext";
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
+import AdminLayout from "./admin/components/AdminLayout";
+import AdminLoginPage from "./admin/pages/AdminLoginPage";
+import AdminDashboard from "./admin/pages/AdminDashboard";
+import AdminProducts from "./admin/pages/AdminProducts";
+import AdminOrders from "./admin/pages/AdminOrders";
+import AdminTenants from "./admin/pages/AdminTenants";
+import AdminSettings from "./admin/pages/AdminSettings";
+import TenantLayout from "./tenant/components/TenantLayout";
+import TenantDashboard from "./tenant/pages/TenantDashboard";
+import TenantProducts from "./tenant/pages/TenantProducts";
+import TenantOrders from "./tenant/pages/TenantOrders";
+import TenantSettings from "./tenant/pages/TenantSettings";
 import HomePage from "./pages/HomePage";
 import CartPage from "./pages/CartPage";
 import {
@@ -15,7 +28,7 @@ import {
   NotFoundPage,
 } from "./pages/PlaceholderPages";
 
-function Layout({ children }) {
+function StorefrontLayout({ children }) {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -25,28 +38,68 @@ function Layout({ children }) {
   );
 }
 
+// Wraps all /admin/* and /tenant/* routes in a single shared AdminAuthProvider
+function AdminRoot() {
+  return (
+    <AdminAuthProvider>
+      <Outlet />
+    </AdminAuthProvider>
+  );
+}
+
 function App() {
   return (
     <BrowserRouter>
-      <CartProvider>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/cart" element={<CartPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/occasions" element={<OccasionsPage />} />
-            <Route path="/occasions/:slug" element={<OccasionsPage />} />
-            <Route path="/bouquets" element={<BouquetsPage />} />
-            <Route path="/bouquets/:slug" element={<BouquetsPage />} />
-            <Route path="/plants" element={<PlantsPage />} />
-            <Route path="/plants/:slug" element={<PlantsPage />} />
-            <Route path="/wishlist" element={<WishlistPage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
-        </Layout>
-      </CartProvider>
+      <Routes>
+        {/* ── All admin/tenant routes share one AdminAuthProvider via AdminRoot ── */}
+        <Route element={<AdminRoot />}>
+          {/* Shared login for both roles */}
+          <Route path="/admin/login" element={<AdminLoginPage />} />
+
+          {/* Super admin — AdminLayout redirects TENANT_ADMIN to /tenant */}
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<AdminDashboard />} />
+            <Route path="products" element={<AdminProducts />} />
+            <Route path="orders"   element={<AdminOrders />} />
+            <Route path="tenants"  element={<AdminTenants />} />
+            <Route path="settings" element={<AdminSettings />} />
+          </Route>
+
+          {/* Tenant admin — TenantLayout redirects non-TENANT_ADMIN away */}
+          <Route path="/tenant" element={<TenantLayout />}>
+            <Route index element={<TenantDashboard />} />
+            <Route path="products" element={<TenantProducts />} />
+            <Route path="orders"   element={<TenantOrders />} />
+            <Route path="settings" element={<TenantSettings />} />
+          </Route>
+        </Route>
+
+        {/* ── Customer-facing storefront ── */}
+        <Route
+          path="*"
+          element={
+            <CartProvider>
+              <StorefrontLayout>
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/cart" element={<CartPage />} />
+                  <Route path="/register" element={<RegisterPage />} />
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/occasions" element={<OccasionsPage />} />
+                  <Route path="/occasions/:slug" element={<OccasionsPage />} />
+                  <Route path="/bouquets" element={<BouquetsPage />} />
+                  <Route path="/bouquets/:slug" element={<BouquetsPage />} />
+                  <Route path="/plants" element={<PlantsPage />} />
+                  <Route path="/plants/:slug" element={<PlantsPage />} />
+                  <Route path="/wishlist" element={<WishlistPage />} />
+                  <Route path="/about" element={<AboutPage />} />
+                  <Route path="*" element={<NotFoundPage />} />
+                </Routes>
+              </StorefrontLayout>
+            </CartProvider>
+          }
+        />
+      </Routes>
     </BrowserRouter>
   );
 }
