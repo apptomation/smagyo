@@ -18,12 +18,12 @@ export const DEMO_ACCOUNTS = [
     avatar: "CR",
   },
   {
-    email: "alice@rosegarden.com",
+    email: "ayman@smagyo.com",
     password: "tenant1234",
-    name: "Alice Johnson",
+    name: "Ayman El Srouji",
     role: "TENANT_ADMIN",
     tenantName: "Rose Garden Shop",
-    avatar: "AJ",
+    avatar: "AE",
   },
 ];
 

@@ -243,9 +243,9 @@ export default function AdminLoginPage() {
           </form>
         )}
 
-        <p className="text-center text-xs text-slate-600">
+        {/* <p className="text-center text-xs text-slate-600">
           API: <code className="text-slate-500">localhost:8080</code>
-        </p>
+        </p> */}
       </div>
     </div>
   );
