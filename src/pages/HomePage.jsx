@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
@@ -9,9 +9,12 @@ import {
   Star,
   Quote,
   CalendarDays,
+  Loader2,
 } from "lucide-react";
 import ProductCard from "../components/ui/ProductCard";
 import { FEATURED_PRODUCTS, OCCASIONS, TESTIMONIALS, BLOG_POSTS } from "../data/products";
+import { useTenant } from "../context/TenantContext";
+import { listPublicProducts } from "../api/tenantApi";
 
 const C = {
   charcoal: "#1C1C1C",
@@ -22,9 +25,32 @@ const C = {
   rose: "#F4A5A5",
 };
 
+const GRADIENTS = [
+  "from-rose-100 to-pink-50",
+  "from-emerald-100 to-teal-50",
+  "from-amber-100 to-orange-50",
+  "from-purple-100 to-violet-50",
+  "from-slate-100 to-gray-50",
+  "from-blue-100 to-cyan-50",
+  "from-teal-100 to-green-50",
+  "from-orange-100 to-amber-50",
+];
+
+/** Adapts a backend ProductDto to the shape ProductCard expects. */
+function toDisplayProduct(p) {
+  const idx = p.id.codePointAt(p.id.length - 1) % GRADIENTS.length;
+  return {
+    ...p,
+    gradient: GRADIENTS[idx],
+    tag: p.stock === 0 ? "Sold Out" : (p.category ?? "Featured"),
+    rating: 4.8,
+    reviews: 0,
+  };
+}
+
 // ─── Hero ─────────────────────────────────────────────────────────────────────
-function Hero() {
-  const heroProducts = FEATURED_PRODUCTS.slice(0, 4);
+function Hero({ products }) {
+  const heroProducts = (products.length > 0 ? products : FEATURED_PRODUCTS).slice(0, 4);
 
   return (
     <section
@@ -54,7 +80,7 @@ function Hero() {
               fontFamily: "'DM Sans', sans-serif",
             }}
           >
-            <Leaf size={11} /> Seasonal Collection · Summer 2025
+            <Leaf size={11} /> Seasonal Collection · Summer 2026
           </span>
 
           <h1
@@ -267,7 +293,9 @@ function OccasionsSection() {
 }
 
 // ─── Featured Products ────────────────────────────────────────────────────────
-function FeaturedProducts() {
+function FeaturedProducts({ products, loading, error }) {
+  const displayList = products.length > 0 ? products : FEATURED_PRODUCTS;
+
   return (
     <section
       className="py-20 px-6 md:px-12"
@@ -298,11 +326,22 @@ function FeaturedProducts() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {FEATURED_PRODUCTS.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        {loading ? (
+          <div className="flex items-center justify-center gap-3 py-20">
+            <Loader2 size={20} className="animate-spin" style={{ color: C.sage }} />
+            <span className="text-sm" style={{ color: C.sage, fontFamily: "'DM Sans', sans-serif" }}>Loading products…</span>
+          </div>
+        ) : error ? (
+          <p className="text-center py-12 text-sm" style={{ color: "#e74c3c", fontFamily: "'DM Sans', sans-serif" }}>
+            {error}
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {displayList.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
 
         <div className="mt-8 text-center md:hidden">
           <Link
@@ -669,12 +708,27 @@ function NewsletterCTA() {
 
 // ─── HomePage ─────────────────────────────────────────────────────────────────
 export default function HomePage() {
+  const { tenantId } = useTenant();
+  const [products, setProducts]               = useState([]);
+  const [productsLoading, setProductsLoading] = useState(false);
+  const [productsError,   setProductsError]   = useState(null);
+
+  useEffect(() => {
+    if (!tenantId) return;
+    setProductsLoading(true);
+    setProductsError(null);
+    listPublicProducts(tenantId)
+      .then((data) => setProducts(data.map(toDisplayProduct)))
+      .catch((err) => setProductsError(err.message))
+      .finally(() => setProductsLoading(false));
+  }, [tenantId]);
+
   return (
     <>
-      <Hero />
+      <Hero products={products} />
       <FeaturesStrip />
       <OccasionsSection />
-      <FeaturedProducts />
+      <FeaturedProducts products={products} loading={productsLoading} error={productsError} />
       <PromoBanner />
       <WhyChooseUs />
       <Testimonials />

@@ -1,18 +1,37 @@
-import { useState, useEffect, useCallback } from "react";
-import { Plus, Search, Edit2, Trash2, Eye, EyeOff, Loader2, AlertCircle } from "lucide-react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { Plus, Search, Edit2, Trash2, Eye, EyeOff, Loader2, AlertCircle, Upload, X } from "lucide-react";
 import { useAdminAuth } from "../../admin/context/AdminAuthContext";
 import * as productApi from "../../api/productApi";
 
 const CATEGORIES = ["All", "Bouquets", "Arrangements", "Plants", "Gift Sets"];
 const OCCASIONS  = ["All", "Birthday", "Wedding", "Anniversary", "Romance", "Sympathy", "New Baby"];
 
-function ProductModal({ product, onClose, onSave, saving }) {
+function ProductModal({ product, onClose, onSave, saving, token }) {
   const [form, setForm] = useState(
     product
       ? { ...product, price: String(product.price), stock: String(product.stock) }
       : { name: "", description: "", category: "Bouquets", occasion: "Birthday", price: "", stock: "", active: true, emoji: "💐" }
   );
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [imageError, setImageError] = useState("");
+  const fileInputRef = useRef(null);
+
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setImageError("");
+    setUploadingImage(true);
+    try {
+      const { url } = await productApi.uploadProductImage(token, file);
+      set("imageUrl", url);
+    } catch (err) {
+      setImageError(err.message);
+    } finally {
+      setUploadingImage(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-[400] flex items-center justify-center p-4">
@@ -26,6 +45,46 @@ function ProductModal({ product, onClose, onSave, saving }) {
         </div>
 
         <div className="px-6 py-5 space-y-4 max-h-[70vh] overflow-y-auto">
+          {/* Product Image */}
+          <div>
+            <label className="text-xs font-semibold text-slate-500 mb-1.5 block">Product Image</label>
+            <div className="flex items-center gap-3">
+              <div className="w-16 h-16 rounded-xl overflow-hidden border border-slate-200 flex-shrink-0 bg-emerald-50 flex items-center justify-center">
+                {form.imageUrl
+                  ? <img src={form.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                  : <span className="text-2xl">{form.emoji ?? "💐"}</span>
+                }
+              </div>
+              <div className="flex-1 min-w-0">
+                <label className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 text-sm cursor-pointer transition ${
+                  uploadingImage ? "text-slate-400 bg-slate-50" : "text-slate-600 hover:bg-slate-50"
+                }`}>
+                  {uploadingImage ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+                  {uploadingImage ? "Uploading…" : "Choose image"}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    className="hidden"
+                    onChange={handleImageChange}
+                    disabled={uploadingImage}
+                  />
+                </label>
+                <p className="text-[11px] text-slate-400 mt-1">JPEG, PNG, WebP or GIF · Max 5 MB</p>
+                {imageError && <p className="text-[11px] text-red-500 mt-1">{imageError}</p>}
+              </div>
+              {form.imageUrl && (
+                <button
+                  onClick={() => set("imageUrl", null)}
+                  className="flex-shrink-0 w-7 h-7 rounded-full bg-slate-100 hover:bg-red-50 hover:text-red-500 flex items-center justify-center text-slate-400 transition-colors"
+                  aria-label="Remove image"
+                >
+                  <X size={13} />
+                </button>
+              )}
+            </div>
+          </div>
+
           {/* Emoji picker */}
           <div>
             <label className="text-xs font-semibold text-slate-500 mb-1.5 block">Emoji / Icon</label>
@@ -310,8 +369,11 @@ export default function TenantProducts() {
                   <tr key={p.id} className="hover:bg-slate-50/60 transition-colors group">
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-xl flex-shrink-0">
-                          {p.emoji ?? "💐"}
+                        <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0">
+                          {p.imageUrl
+                            ? <img src={p.imageUrl} alt={p.name} className="w-full h-full object-cover" />
+                            : <div className="w-full h-full bg-emerald-50 flex items-center justify-center text-xl">{p.emoji ?? "💐"}</div>
+                          }
                         </div>
                         <span className="text-sm font-semibold text-slate-700">{p.name}</span>
                       </div>
@@ -353,7 +415,7 @@ export default function TenantProducts() {
       </div>
 
       {modal !== null && (
-        <ProductModal product={modal === "new" ? null : modal} onClose={() => setModal(null)} onSave={saveProduct} saving={saving} />
+        <ProductModal product={modal === "new" ? null : modal} onClose={() => setModal(null)} onSave={saveProduct} saving={saving} token={token} />
       )}
     </div>
   );

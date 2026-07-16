@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import { CartProvider } from "./context/CartContext";
+import { TenantProvider } from "./context/TenantContext";
 import { AdminAuthProvider } from "./admin/context/AdminAuthContext";
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
@@ -78,8 +79,9 @@ function App() {
         <Route
           path="*"
           element={
-            <CartProvider>
-              <StorefrontLayout>
+            <TenantProvider>
+              <CartProvider>
+                <StorefrontLayout>
                 <Routes>
                   <Route path="/" element={<HomePage />} />
                   <Route path="/cart" element={<CartPage />} />
@@ -97,6 +99,7 @@ function App() {
                 </Routes>
               </StorefrontLayout>
             </CartProvider>
+            </TenantProvider>
           }
         />
       </Routes>

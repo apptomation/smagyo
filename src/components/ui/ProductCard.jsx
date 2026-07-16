@@ -22,15 +22,23 @@ export default function ProductCard({ product, size = "default" }) {
         boxShadow: "0 2px 16px rgba(0,0,0,.04)",
       }}
     >
-      {/* Image placeholder */}
+      {/* Image / emoji */}
       <div
         className={`relative overflow-hidden bg-gradient-to-br ${product.gradient} ${
           size === "large" ? "h-64" : "h-48"
         }`}
       >
-        <div className="absolute inset-0 flex items-center justify-center text-6xl opacity-50 group-hover:scale-110 transition-transform duration-500 select-none">
-          {product.emoji}
-        </div>
+        {product.imageUrl ? (
+          <img
+            src={product.imageUrl}
+            alt={product.name}
+            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center text-6xl opacity-50 group-hover:scale-110 transition-transform duration-500 select-none">
+            {product.emoji}
+          </div>
+        )}
 
         {/* Tag badge */}
         <span

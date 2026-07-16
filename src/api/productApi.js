@@ -1,19 +1,8 @@
-const BASE = import.meta.env.VITE_API_URL ?? "http://localhost:8080";
+import { apiFetch, BASE } from './apiFetch';
+import { getTenantId } from './tenantStore';
 
-async function handleResponse(res) {
-  if (res.status === 204) return null;
-  const body = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    throw new Error(body.detail ?? body.message ?? `Request failed (${res.status})`);
-  }
-  return body;
-}
-
-function authHeaders(token) {
-  return {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${token}`,
-  };
+function authHeader(token) {
+  return { Authorization: `Bearer ${token}` };
 }
 
 /**
@@ -21,9 +10,9 @@ function authHeaders(token) {
  * Returns Spring Page<ProductDto>: { content: [...], totalElements, ... }
  */
 export function listProducts(token, page = 0, size = 100) {
-  return fetch(`${BASE}/api/products/admin?page=${page}&size=${size}`, {
-    headers: authHeaders(token),
-  }).then(handleResponse);
+  return apiFetch(`/api/products/admin?page=${page}&size=${size}`, {
+    headers: authHeader(token),
+  });
 }
 
 /**
@@ -31,11 +20,11 @@ export function listProducts(token, page = 0, size = 100) {
  * Returns the created ProductDto
  */
 export function createProduct(token, data) {
-  return fetch(`${BASE}/api/products/admin`, {
-    method: "POST",
-    headers: authHeaders(token),
+  return apiFetch('/api/products/admin', {
+    method: 'POST',
+    headers: authHeader(token),
     body: JSON.stringify(data),
-  }).then(handleResponse);
+  });
 }
 
 /**
@@ -43,11 +32,11 @@ export function createProduct(token, data) {
  * Returns the updated ProductDto
  */
 export function updateProduct(token, id, data) {
-  return fetch(`${BASE}/api/products/admin/${id}`, {
-    method: "PUT",
-    headers: authHeaders(token),
+  return apiFetch(`/api/products/admin/${id}`, {
+    method: 'PUT',
+    headers: authHeader(token),
     body: JSON.stringify(data),
-  }).then(handleResponse);
+  });
 }
 
 /**
@@ -55,8 +44,34 @@ export function updateProduct(token, id, data) {
  * Returns null (204 No Content)
  */
 export function deleteProduct(token, id) {
-  return fetch(`${BASE}/api/products/admin/${id}`, {
-    method: "DELETE",
-    headers: authHeaders(token),
-  }).then(handleResponse);
+  return apiFetch(`/api/products/admin/${id}`, {
+    method: 'DELETE',
+    headers: authHeader(token),
+  });
+}
+
+/**
+ * POST /api/products/admin/images  (multipart/form-data)
+ * Uploads an image to Azure Blob Storage and returns { url: "https://..." }.
+ * Does NOT use apiFetch because Content-Type must be set by the browser (with boundary).
+ */
+export async function uploadProductImage(token, file) {
+  const tenantId = getTenantId();
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const res = await fetch(`${BASE}/api/products/admin/images`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      ...(tenantId ? { 'X-Tenant-ID': tenantId } : {}),
+    },
+    body: formData,
+  });
+
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(body.detail ?? body.message ?? `Upload failed (${res.status})`);
+  }
+  return body; // { url: "..." }
 }
