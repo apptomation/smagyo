@@ -55,9 +55,9 @@ export default function Navbar() {
         <span>🌿 Sustainably sourced · Same-day delivery available</span>
         <span>Free delivery on orders over $60 · Use code BLOOM10 for 10% off</span>
         <span className="flex items-center gap-3">
-          <a href="/login" className="hover:underline">Sign In</a>
+          <a href="/admin/login" className="hover:underline">Sign In</a>
           <span>|</span>
-          <a href="/register" className="hover:underline">Create Account</a>
+          <a href="/admin/login" className="hover:underline">Create Account</a>
         </span>
       </div>
 
@@ -84,7 +84,7 @@ export default function Navbar() {
               className="font-bold text-xl tracking-tight hidden sm:block"
               style={{ fontFamily: "'Playfair Display', Georgia, serif", color: C.charcoal }}
             >
-              smag<span style={{ color: C.emerald }}>yo</span>
+              sma<span style={{ color: C.emerald }}>yo</span>
             </span>
           </Link>
 

@@ -438,7 +438,7 @@ function WhyChooseUs() {
             className="text-3xl md:text-4xl font-bold"
             style={{ fontFamily: "'Playfair Display', Georgia, serif", color: C.charcoal }}
           >
-            Why Smagyo?
+            Why Smayo?
           </h2>
           <p
             className="mt-3 text-base max-w-lg mx-auto"

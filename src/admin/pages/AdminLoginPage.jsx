@@ -102,7 +102,7 @@ export default function AdminLoginPage() {
               <Leaf size={18} color="#fff" strokeWidth={2.5} />
             </span>
             <span className="text-2xl font-bold text-white" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
-              smag<span className="text-emerald-400">yo</span>
+           <a href="/" className="hover:underline">smay<span className="text-emerald-400">o</span></a>
             </span>
           </div>
           <p className="text-sm text-slate-400">Flower E-Commerce Platform</p>
@@ -227,7 +227,7 @@ export default function AdminLoginPage() {
                       placeholder="rosegarden" pattern="^[a-z0-9-]{2,30}$"
                       title="2–30 lowercase letters, digits, or hyphens"
                       className="flex-1 px-4 py-3 bg-slate-800 text-sm text-white placeholder-slate-500 outline-none" />
-                    <span className="px-3 flex items-center text-xs text-slate-500 bg-slate-800 border-l border-slate-700 whitespace-nowrap">.smagyo.com</span>
+                    <span className="px-3 flex items-center text-xs text-slate-500 bg-slate-800 border-l border-slate-700 whitespace-nowrap">.smayo.com</span>
                   </div>
                 </Field>
 

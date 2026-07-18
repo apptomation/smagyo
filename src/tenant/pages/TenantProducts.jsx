@@ -226,7 +226,12 @@ export default function TenantProducts() {
       const page = await productApi.listProducts(token);
       setProducts(page.content);
     } catch (err) {
-      setError(err.message);
+      //if Request failed (403) then redirect to login page
+      if (err.message.includes("403")) {
+        window.location.href = "/admin/login";
+      } else {
+        setError(err.message);
+      }
     } finally {
       setLoading(false);
     }

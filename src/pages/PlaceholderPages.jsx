@@ -123,7 +123,7 @@ export function AboutPage() {
     <PlaceholderPage
       title="Our Story"
       emoji="🌱"
-      description="Smagyo was born from a love of flowers and a belief that nature's beauty should be available to everyone, sustainably."
+      description="Smayo was born from a love of flowers and a belief that nature's beauty should be available to everyone, sustainably."
       ctaLabel="Shop Now"
       ctaHref="/bouquets"
     />
