@@ -3,7 +3,7 @@ import { getTenantId } from './tenantStore';
 const BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:8080';
 
 async function handleResponse(res) {
-  if (res.status === 204 || res.status === 201) return null;
+  if (res.status === 204) return null;
   const body = await res.json().catch(() => ({}));
   if (!res.ok) {
     throw new Error(body.detail ?? body.message ?? `Request failed (${res.status})`);

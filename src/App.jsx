@@ -21,13 +21,11 @@ import CartPage from "./pages/CartPage";
 import {
   RegisterPage,
   LoginPage,
-  OccasionsPage,
-  BouquetsPage,
-  PlantsPage,
   WishlistPage,
   AboutPage,
   NotFoundPage,
 } from "./pages/PlaceholderPages";
+import ShopPage from "./pages/ShopPage";
 
 function StorefrontLayout({ children }) {
   return (
@@ -87,12 +85,12 @@ function App() {
                   <Route path="/cart" element={<CartPage />} />
                   <Route path="/register" element={<RegisterPage />} />
                   <Route path="/login" element={<LoginPage />} />
-                  <Route path="/occasions" element={<OccasionsPage />} />
-                  <Route path="/occasions/:slug" element={<OccasionsPage />} />
-                  <Route path="/bouquets" element={<BouquetsPage />} />
-                  <Route path="/bouquets/:slug" element={<BouquetsPage />} />
-                  <Route path="/plants" element={<PlantsPage />} />
-                  <Route path="/plants/:slug" element={<PlantsPage />} />
+                  <Route path="/occasions" element={<ShopPage title="Shop by Occasion" />} />
+                  <Route path="/occasions/:slug" element={<ShopPage title="Shop by Occasion" />} />
+                  <Route path="/bouquets" element={<ShopPage defaultCategory="Bouquets" />} />
+                  <Route path="/bouquets/:slug" element={<ShopPage defaultCategory="Bouquets" />} />
+                  <Route path="/plants" element={<ShopPage defaultCategory="Plants" />} />
+                  <Route path="/plants/:slug" element={<ShopPage defaultCategory="Plants" />} />
                   <Route path="/wishlist" element={<WishlistPage />} />
                   <Route path="/about" element={<AboutPage />} />
                   <Route path="*" element={<NotFoundPage />} />

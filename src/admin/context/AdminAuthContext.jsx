@@ -9,16 +9,16 @@ const STORAGE_KEY = "smagyo_admin_user";
  * TENANT_ADMIN accounts are created via the register form.
  */
 export const DEMO_ACCOUNTS = [
+  // {
+  //   email: "chadi@smagyo.com",
+  //   password: "super1234",
+  //   name: "Chadi Rahme",
+  //   role: "SUPER_ADMIN",
+  //   tenantName: "Smagyo Platform",
+  //   avatar: "CR",
+  // },
   {
-    email: "chadi@smagyo.com",
-    password: "super1234",
-    name: "Chadi Rahme",
-    role: "SUPER_ADMIN",
-    tenantName: "Smagyo Platform",
-    avatar: "CR",
-  },
-  {
-    email: "ayman@smagyo.com",
+    email: "ayman@smayo.com",
     password: "tenant1234",
     name: "Ayman El Srouji",
     role: "TENANT_ADMIN",

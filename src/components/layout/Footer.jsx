@@ -75,10 +75,10 @@ const SocialIcons = {
 };
 
 const SOCIAL = [
-  { Icon: SocialIcons.Instagram, label: "Instagram", href: "#" },
-  { Icon: SocialIcons.Facebook, label: "Facebook", href: "#" },
-  { Icon: SocialIcons.Twitter, label: "Twitter / X", href: "#" },
-  { Icon: SocialIcons.Youtube, label: "YouTube", href: "#" },
+  { Icon: SocialIcons.Instagram, label: "Instagram", href: "https://www.instagram.com/smayoflowers/" },
+  { Icon: SocialIcons.Facebook, label: "Facebook", href: "https://www.instagram.com/smayoflowers/" },
+  { Icon: SocialIcons.Twitter, label: "Twitter / X", href: "https://www.instagram.com/smayoflowers/" },
+  { Icon: SocialIcons.Youtube, label: "YouTube", href: "https://www.instagram.com/smayoflowers/" },
 ];
 
 export default function Footer() {
@@ -108,7 +108,7 @@ export default function Footer() {
               className="font-bold text-xl tracking-tight"
               style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
             >
-              smag<span style={{ color: C.mint }}>yo</span>
+              sma<span style={{ color: C.mint }}>yo</span>
             </span>
           </Link>
 
@@ -126,21 +126,21 @@ export default function Footer() {
               style={{ color: "rgba(255,255,255,.5)", fontFamily: "'DM Sans', sans-serif" }}
             >
               <Phone size={13} style={{ color: C.mint }} />
-              <span>+1 (800) SMAGYO-1</span>
+              <span>+1 (226) 927-7705</span>
             </div>
             <div
               className="flex items-center gap-2 text-sm"
               style={{ color: "rgba(255,255,255,.5)", fontFamily: "'DM Sans', sans-serif" }}
             >
               <Mail size={13} style={{ color: C.mint }} />
-              <span>hello@smagyo.com</span>
+              <span><a href="mailto:info@proceedsystems.com">info@proceedsystems.com</a></span>
             </div>
             <div
               className="flex items-center gap-2 text-sm"
               style={{ color: "rgba(255,255,255,.5)", fontFamily: "'DM Sans', sans-serif" }}
             >
               <MapPin size={13} style={{ color: C.mint }} />
-              <span>21 Bloom Street, New York, NY 10001</span>
+              <span>Milton, ON, Canada (Remote Worldwide)</span>
             </div>
           </div>
         </div>
@@ -228,6 +228,7 @@ export default function Footer() {
         <div className="flex items-center gap-3">
           {SOCIAL.map(({ Icon, label, href }) => (
             <a
+            target="_blank" rel="noopener noreferrer"
               key={label}
               href={href}
               aria-label={label}
@@ -262,7 +263,7 @@ export default function Footer() {
           className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs"
           style={{ color: "rgba(255,255,255,.28)", fontFamily: "'DM Sans', sans-serif" }}
         >
-          <span>© 2025 Smagyo Inc. All rights reserved.</span>
+          <span>© 2026 <a href="https://proceedsystems.com" target="_blank" rel="noopener noreferrer">Proceed Systems</a>. All rights reserved.</span>
           <div className="flex gap-5">
             {["Privacy Policy", "Terms of Service", "Cookie Preferences"].map((t) => (
               <Link

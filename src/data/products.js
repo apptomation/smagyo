@@ -88,7 +88,7 @@ export const TESTIMONIALS = [
     name: "Sarah M.",
     location: "New York, NY",
     rating: 5,
-    text: "Absolutely stunning bouquet for my daughter's wedding! The flowers were fresh and exactly as pictured. Smagyo made our special day even more beautiful.",
+    text: "Absolutely stunning bouquet for my daughter's wedding! The flowers were fresh and exactly as pictured. Smayo made our special day even more beautiful.",
     avatar: "SM",
     avatarColor: "bg-rose-200 text-rose-700",
   },
