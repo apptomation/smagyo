@@ -45,7 +45,7 @@ export function AdminAuthProvider({ children }) {
       setUser(safeUser);
       return { ok: true, role: data.role };
     } catch (err) {
-      return { error: err.message };
+      return { error: err.message, status: err.status };
     }
   };
 

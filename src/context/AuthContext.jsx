@@ -19,7 +19,7 @@ export function AuthProvider({ children }) {
       setUser(data);
       return { ok: true };
     } catch (err) {
-      return { error: err.message };
+      return { error: err.message, status: err.status };
     }
   };
 
@@ -30,7 +30,7 @@ export function AuthProvider({ children }) {
       setUser(data);
       return { ok: true };
     } catch (err) {
-      return { error: err.message };
+      return { error: err.message, status: err.status };
     }
   };
 

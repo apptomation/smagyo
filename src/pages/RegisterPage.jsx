@@ -29,8 +29,15 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       const result = await register(name, email, password);
-      if (result.ok) navigate(from, { replace: true });
-      else setError(result.error ?? "Registration failed");
+      if (result.ok) {
+        navigate(from, { replace: true });
+      } else if (result.status === 409) {
+        setError("An account with this email already exists.");
+      } else if (result.status == null) {
+        setError("Server is down, please try again later.");
+      } else {
+        setError(result.error ?? "Registration failed");
+      }
     } finally {
       setLoading(false);
     }

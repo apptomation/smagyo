@@ -37,8 +37,15 @@ export default function AdminLoginPage() {
     setLoginLoading(true);
     try {
       const result = await login(email.trim().toLowerCase(), password);
-      if (result.ok) navigate(result.role === "TENANT_ADMIN" ? "/tenant" : "/admin", { replace: true });
-      else setLoginErr(result.error ?? "Login failed");
+      if (result.ok) {
+        navigate(result.role === "TENANT_ADMIN" ? "/tenant" : "/admin", { replace: true });
+      } else if (result.status === 401) {
+        setLoginErr("Invalid email or password.");
+      } else if (result.status == null) {
+        setLoginErr("Server is down, please try again later.");
+      } else {
+        setLoginErr(result.error ?? "Login failed");
+      }
     } finally {
       setLoginLoading(false);
     }
@@ -85,7 +92,13 @@ export default function AdminLoginPage() {
         setRegName(""); setRegEmail(""); setRegPassword(""); setStoreName(""); setSubdomain("");
       }, 2200);
     } catch (err) {
-      setRegErr(err.message);
+      if (err.status === 409) {
+        setRegErr("This email or subdomain is already in use.");
+      } else if (err.status == null) {
+        setRegErr("Server is down, please try again later.");
+      } else {
+        setRegErr(err.message);
+      }
     } finally {
       setRegLoading(false);
     }
