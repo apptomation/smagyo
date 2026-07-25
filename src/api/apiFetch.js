@@ -6,7 +6,9 @@ async function handleResponse(res) {
   if (res.status === 204) return null;
   const body = await res.json().catch(() => ({}));
   if (!res.ok) {
-    throw new Error(body.detail ?? body.message ?? `Request failed (${res.status})`);
+    const err = new Error(body.detail ?? body.message ?? `Request failed (${res.status})`);
+    err.status = res.status;
+    throw err;
   }
   return body;
 }

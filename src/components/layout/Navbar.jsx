@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import {
   Search,
   Heart,
@@ -11,6 +11,7 @@ import {
   User,
 } from "lucide-react";
 import { useCart } from "../../context/CartContext";
+import { useAuth } from "../../context/AuthContext";
 import { NAV_LINKS } from "../../data/navigation";
 
 const C = {
@@ -23,12 +24,22 @@ const C = {
 
 export default function Navbar() {
   const { totalItems } = useCart();
+  const { user, isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null);
+  const [accountOpen, setAccountOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const searchRef = useRef(null);
+
+  const handleLogout = () => {
+    logout();
+    setAccountOpen(false);
+    setMenuOpen(false);
+    navigate("/");
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -55,9 +66,7 @@ export default function Navbar() {
         <span>🌿 Sustainably sourced · Same-day delivery available</span>
         <span>Free delivery on orders over $60 · Use code BLOOM10 for 10% off</span>
         <span className="flex items-center gap-3">
-          <a href="/admin/login" className="hover:underline">Sign In</a>
-          <span>|</span>
-          <a href="/admin/login" className="hover:underline">Create Account</a>
+          <Link to="/admin/login" className="hover:underline">Own a flower shop? Sign in</Link>
         </span>
       </div>
 
@@ -118,31 +127,36 @@ export default function Navbar() {
                   )}
                 </NavLink>
 
-                {/* Dropdown */}
+                {/* Dropdown — outer wrapper sits flush against the trigger (no gap) and
+                    uses padding, not margin, to push the visible box down. That keeps the
+                    whole hover path (trigger → padding bridge → menu) inside the same
+                    hoverable subtree so the mouse never crosses into unrelated space. */}
                 {link.sub.length > 0 && openDropdown === link.label && (
-                  <div
-                    className="absolute top-full left-0 mt-1 w-52 rounded-2xl overflow-hidden shadow-xl py-1.5"
-                    style={{
-                      background: "rgba(255,255,255,0.97)",
-                      backdropFilter: "blur(12px)",
-                      border: "1px solid rgba(45,106,79,.12)",
-                    }}
-                  >
-                    {link.sub.map((s) => (
-                      <Link
-                        key={s.label}
-                        to={s.href}
-                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm transition-colors duration-100 hover:bg-emerald-50"
-                        style={{
-                          color: C.charcoal,
-                          fontFamily: "'DM Sans', sans-serif",
-                        }}
-                        onClick={() => setOpenDropdown(null)}
-                      >
-                        <span className="text-base">{s.emoji}</span>
-                        {s.label}
-                      </Link>
-                    ))}
+                  <div className="absolute top-full left-0 pt-1.5 w-52">
+                    <div
+                      className="rounded-2xl overflow-hidden shadow-xl py-1.5"
+                      style={{
+                        background: "rgba(255,255,255,0.97)",
+                        backdropFilter: "blur(12px)",
+                        border: "1px solid rgba(45,106,79,.12)",
+                      }}
+                    >
+                      {link.sub.map((s) => (
+                        <Link
+                          key={s.label}
+                          to={s.href}
+                          className="flex items-center gap-2.5 px-4 py-2.5 text-sm transition-colors duration-100 hover:bg-emerald-50"
+                          style={{
+                            color: C.charcoal,
+                            fontFamily: "'DM Sans', sans-serif",
+                          }}
+                          onClick={() => setOpenDropdown(null)}
+                        >
+                          <span className="text-base">{s.emoji}</span>
+                          {s.label}
+                        </Link>
+                      ))}
+                    </div>
                   </div>
                 )}
               </li>
@@ -207,14 +221,58 @@ export default function Navbar() {
             </Link>
 
             {/* Account */}
-            <Link
-              to="/login"
-              className="w-9 h-9 rounded-full items-center justify-center hover:bg-emerald-50 transition-colors hidden md:flex"
-              style={{ color: C.charcoal }}
-              aria-label="Account"
+            <div
+              className="relative hidden md:flex"
+              onMouseEnter={() => setAccountOpen(true)}
+              onMouseLeave={() => setAccountOpen(false)}
             >
-              <User size={18} />
-            </Link>
+              {isAuthenticated ? (
+                <>
+                  <button
+                    className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold transition-colors"
+                    style={{ color: C.emerald, background: "rgba(45,106,79,.1)" }}
+                    aria-label="Account"
+                  >
+                    {user.name?.charAt(0).toUpperCase() ?? <User size={18} />}
+                  </button>
+                  {accountOpen && (
+                    <div className="absolute top-full right-0 pt-1.5 w-52">
+                      <div
+                        className="rounded-2xl overflow-hidden shadow-xl py-1.5"
+                        style={{
+                          background: "rgba(255,255,255,0.97)",
+                          backdropFilter: "blur(12px)",
+                          border: "1px solid rgba(45,106,79,.12)",
+                        }}
+                      >
+                        <p
+                          className="px-4 pt-2 pb-2.5 text-xs truncate border-b"
+                          style={{ color: C.sage, borderColor: "rgba(45,106,79,.1)", fontFamily: "'DM Sans', sans-serif" }}
+                        >
+                          Signed in as <span style={{ color: C.charcoal, fontWeight: 600 }}>{user.name}</span>
+                        </p>
+                        <button
+                          onClick={handleLogout}
+                          className="w-full text-left px-4 py-2.5 text-sm hover:bg-emerald-50 transition-colors"
+                          style={{ color: C.charcoal, fontFamily: "'DM Sans', sans-serif" }}
+                        >
+                          Log out
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <Link
+                  to="/login"
+                  className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-emerald-50 transition-colors"
+                  style={{ color: C.charcoal }}
+                  aria-label="Account"
+                >
+                  <User size={18} />
+                </Link>
+              )}
+            </div>
 
             {/* Cart */}
             <Link
@@ -353,18 +411,32 @@ export default function Navbar() {
 
           {/* Drawer CTA buttons */}
           <div className="px-5 pb-8 flex gap-3">
-            <Link
-              to="/login"
-              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full text-sm font-medium border transition-colors hover:bg-emerald-50"
-              style={{
-                borderColor: C.emerald,
-                color: C.emerald,
-                fontFamily: "'DM Sans', sans-serif",
-              }}
-              onClick={() => setMenuOpen(false)}
-            >
-              <User size={14} /> Sign In
-            </Link>
+            {isAuthenticated ? (
+              <button
+                onClick={handleLogout}
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full text-sm font-medium border transition-colors hover:bg-emerald-50"
+                style={{
+                  borderColor: C.emerald,
+                  color: C.emerald,
+                  fontFamily: "'DM Sans', sans-serif",
+                }}
+              >
+                <User size={14} /> Log out
+              </button>
+            ) : (
+              <Link
+                to="/login"
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full text-sm font-medium border transition-colors hover:bg-emerald-50"
+                style={{
+                  borderColor: C.emerald,
+                  color: C.emerald,
+                  fontFamily: "'DM Sans', sans-serif",
+                }}
+                onClick={() => setMenuOpen(false)}
+              >
+                <User size={14} /> Sign In
+              </Link>
+            )}
             <Link
               to="/cart"
               className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full text-sm font-medium text-white transition-colors"

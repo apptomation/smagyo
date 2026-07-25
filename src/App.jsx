@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import { CartProvider } from "./context/CartContext";
 import { TenantProvider } from "./context/TenantContext";
+import { AuthProvider } from "./context/AuthContext";
 import { AdminAuthProvider } from "./admin/context/AdminAuthContext";
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
@@ -18,9 +19,10 @@ import TenantOrders from "./tenant/pages/TenantOrders";
 import TenantSettings from "./tenant/pages/TenantSettings";
 import HomePage from "./pages/HomePage";
 import CartPage from "./pages/CartPage";
+import CheckoutPage from "./pages/CheckoutPage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 import {
-  RegisterPage,
-  LoginPage,
   WishlistPage,
   AboutPage,
   NotFoundPage,
@@ -78,11 +80,13 @@ function App() {
           path="*"
           element={
             <TenantProvider>
+              <AuthProvider>
               <CartProvider>
                 <StorefrontLayout>
                 <Routes>
                   <Route path="/" element={<HomePage />} />
                   <Route path="/cart" element={<CartPage />} />
+                  <Route path="/checkout" element={<CheckoutPage />} />
                   <Route path="/register" element={<RegisterPage />} />
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/occasions" element={<ShopPage title="Shop by Occasion" />} />
@@ -97,6 +101,7 @@ function App() {
                 </Routes>
               </StorefrontLayout>
             </CartProvider>
+            </AuthProvider>
             </TenantProvider>
           }
         />
