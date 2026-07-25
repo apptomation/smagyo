@@ -29,8 +29,15 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const result = await login(email, password);
-      if (result.ok) navigate(from, { replace: true });
-      else setError(result.error ?? "Login failed");
+      if (result.ok) {
+        navigate(from, { replace: true });
+      } else if (result.status === 401) {
+        setError("Invalid email or password.");
+      } else if (result.status == null) {
+        setError("Server is down, please try again later.");
+      } else {
+        setError(result.error ?? "Login failed");
+      }
     } finally {
       setLoading(false);
     }
