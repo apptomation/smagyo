@@ -46,30 +46,6 @@ function PlaceholderPage({ title, emoji, description, ctaLabel, ctaHref }) {
   );
 }
 
-export function RegisterPage() {
-  return (
-    <PlaceholderPage
-      title="Create Your Account"
-      emoji="🌸"
-      description="Join the Smagyo community to track orders, save wishlists, and unlock exclusive member deals."
-      ctaLabel="Back to Home"
-      ctaHref="/"
-    />
-  );
-}
-
-export function LoginPage() {
-  return (
-    <PlaceholderPage
-      title="Welcome Back"
-      emoji="🌿"
-      description="Sign in to your Smagyo account to access your orders, wishlist, and saved preferences."
-      ctaLabel="Back to Home"
-      ctaHref="/"
-    />
-  );
-}
-
 export function OccasionsPage() {
   return (
     <PlaceholderPage

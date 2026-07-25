@@ -1,6 +1,7 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ShoppingCart, Trash2, ArrowRight, Leaf } from "lucide-react";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 
 const C = {
   charcoal: "#1C1C1C",
@@ -11,6 +12,13 @@ const C = {
 
 export default function CartPage() {
   const { items, removeItem, updateQty, totalItems, totalPrice } = useCart();
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  const handleCheckout = () => {
+    if (isAuthenticated) navigate("/checkout");
+    else navigate("/login", { state: { from: "/checkout" } });
+  };
 
   if (items.length === 0) {
     return (
@@ -131,20 +139,19 @@ export default function CartPage() {
                   <span>${totalPrice.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm" style={{ color: C.sage, fontFamily: "'DM Sans', sans-serif" }}>
-                  <span>Delivery</span>
-                  <span className="text-emerald-600 font-medium">
-                    {totalPrice >= 60 ? "Free" : "$8.99"}
-                  </span>
+                  <span>Pickup</span>
+                  <span className="text-emerald-600 font-medium">Free</span>
                 </div>
                 <div
                   className="border-t pt-3 flex justify-between text-base font-bold"
                   style={{ borderColor: "rgba(45,106,79,.1)", color: C.charcoal, fontFamily: "'DM Sans', sans-serif" }}
                 >
                   <span>Total</span>
-                  <span>${(totalPrice + (totalPrice >= 60 ? 0 : 8.99)).toFixed(2)}</span>
+                  <span>${totalPrice.toFixed(2)}</span>
                 </div>
               </div>
               <button
+                onClick={handleCheckout}
                 className="w-full flex items-center justify-center gap-2 py-3.5 rounded-full text-sm font-semibold text-white transition-all hover:opacity-90"
                 style={{ background: C.emerald, fontFamily: "'DM Sans', sans-serif" }}
               >
