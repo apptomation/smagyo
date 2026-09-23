@@ -1,6 +1,8 @@
-import { Link } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Heart, ShoppingCart, Star } from "lucide-react";
 import { useCart } from "../../context/CartContext";
+import { useAuth } from "../../context/AuthContext";
+import { useWishlist } from "../../context/WishlistContext";
 
 const C = {
   charcoal: "#1C1C1C",
@@ -10,6 +12,25 @@ const C = {
 
 export default function ProductCard({ product, size = "default" }) {
   const { addItem } = useCart();
+  const { isAuthenticated } = useAuth();
+  const { isWishlisted, toggle } = useWishlist();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Static fallback products (numeric ids) don't exist in the backend
+  const canWishlist = typeof product.id === "string";
+  const liked = canWishlist && isWishlisted(product.id);
+
+  const handleWishlist = (e) => {
+    e.stopPropagation();
+    if (!isAuthenticated) {
+      navigate("/login", {
+        state: { from: location.pathname, notice: "Sign in to save items to your wishlist." },
+      });
+      return;
+    }
+    toggle(product);
+  };
 
   return (
     <div
@@ -53,14 +74,21 @@ export default function ProductCard({ product, size = "default" }) {
           {product.tag}
         </span>
 
-        {/* Wishlist button */}
-        <button
-          className="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110"
-          style={{ background: "rgba(255,255,255,.88)", backdropFilter: "blur(8px)" }}
-          aria-label={`Add ${product.name} to wishlist`}
-        >
-          <Heart size={14} style={{ color: "#e74c3c" }} />
-        </button>
+        {/* Wishlist button — always visible once liked */}
+        {canWishlist && (
+          <button
+            type="button"
+            onClick={handleWishlist}
+            className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 focus-visible:opacity-100 ${
+              liked ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+            }`}
+            style={{ background: "rgba(255,255,255,.88)", backdropFilter: "blur(8px)" }}
+            aria-label={liked ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
+            aria-pressed={liked}
+          >
+            <Heart size={14} fill={liked ? "#e74c3c" : "none"} style={{ color: "#e74c3c" }} />
+          </button>
+        )}
       </div>
 
       {/* Card body */}

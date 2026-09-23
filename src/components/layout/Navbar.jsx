@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
+import { useWishlist } from "../../context/WishlistContext";
 import { NAV_LINKS } from "../../data/navigation";
 
 const C = {
@@ -25,6 +26,7 @@ const C = {
 export default function Navbar() {
   const { totalItems } = useCart();
   const { user, isAuthenticated, logout } = useAuth();
+  const { count: wishlistCount } = useWishlist();
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -213,11 +215,19 @@ export default function Navbar() {
             {/* Wishlist */}
             <Link
               to="/wishlist"
-              className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-rose-50 transition-colors"
+              className="relative w-9 h-9 rounded-full flex items-center justify-center hover:bg-rose-50 transition-colors"
               style={{ color: C.charcoal }}
-              aria-label="Wishlist"
+              aria-label={`Wishlist (${wishlistCount} items)`}
             >
               <Heart size={18} />
+              {wishlistCount > 0 && (
+                <span
+                  className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] rounded-full flex items-center justify-center text-[10px] font-bold text-white"
+                  style={{ background: "#e74c3c" }}
+                >
+                  {wishlistCount}
+                </span>
+              )}
             </Link>
 
             {/* Account */}
