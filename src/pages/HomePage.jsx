@@ -12,6 +12,7 @@ import {
   Loader2,
 } from "lucide-react";
 import ProductCard from "../components/ui/ProductCard";
+import { toDisplayProduct } from "../utils/displayProduct";
 import { FEATURED_PRODUCTS, OCCASIONS, TESTIMONIALS, BLOG_POSTS } from "../data/products";
 import { useTenant } from "../context/TenantContext";
 import { listPublicProducts } from "../api/tenantApi";
@@ -25,30 +26,16 @@ const C = {
   rose: "#F4A5A5",
 };
 
-const GRADIENTS = [
-  "from-rose-100 to-pink-50",
-  "from-emerald-100 to-teal-50",
-  "from-amber-100 to-orange-50",
-  "from-purple-100 to-violet-50",
-  "from-slate-100 to-gray-50",
-  "from-blue-100 to-cyan-50",
-  "from-teal-100 to-green-50",
-  "from-orange-100 to-amber-50",
+// ─── Hero ─────────────────────────────────────────────────────────────────────
+const FLOATING_PETALS = [
+  { emoji: "🌸", top: "10%", left: "6%", size: 28, duration: 8, delay: 0 },
+  { emoji: "🌺", top: "68%", left: "4%", size: 22, duration: 10, delay: 1.5 },
+  { emoji: "🍃", top: "22%", left: "44%", size: 20, duration: 9, delay: 0.8 },
+  { emoji: "🌷", top: "80%", left: "38%", size: 24, duration: 11, delay: 2.2 },
+  { emoji: "✿", top: "6%", left: "48%", size: 18, duration: 7.5, delay: 3 },
+  { emoji: "🌼", top: "48%", left: "2%", size: 20, duration: 9.5, delay: 1 },
 ];
 
-/** Adapts a backend ProductDto to the shape ProductCard expects. */
-function toDisplayProduct(p) {
-  const idx = p.id.codePointAt(p.id.length - 1) % GRADIENTS.length;
-  return {
-    ...p,
-    gradient: GRADIENTS[idx],
-    tag: p.stock === 0 ? "Sold Out" : (p.category ?? "Featured"),
-    rating: 4.8,
-    reviews: 0,
-  };
-}
-
-// ─── Hero ─────────────────────────────────────────────────────────────────────
 function Hero({ products }) {
   const heroProducts = (products.length > 0 ? products : FEATURED_PRODUCTS).slice(0, 4);
 
@@ -61,13 +48,31 @@ function Hero({ products }) {
     >
       {/* Decorative blobs */}
       <div
-        className="absolute -top-40 -right-40 w-[560px] h-[560px] rounded-full opacity-20 pointer-events-none"
+        className="absolute -top-40 -right-40 w-[560px] h-[560px] rounded-full opacity-20 pointer-events-none animate-blob-pulse"
         style={{ background: `radial-gradient(circle, ${C.mint}, transparent 70%)` }}
       />
       <div
-        className="absolute -bottom-28 -left-28 w-[420px] h-[420px] rounded-full opacity-15 pointer-events-none"
-        style={{ background: `radial-gradient(circle, ${C.rose}, transparent 70%)` }}
+        className="absolute -bottom-28 -left-28 w-[420px] h-[420px] rounded-full opacity-15 pointer-events-none animate-blob-pulse"
+        style={{ background: `radial-gradient(circle, ${C.rose}, transparent 70%)`, animationDelay: "2s" }}
       />
+
+      {/* Floating petals */}
+      {FLOATING_PETALS.map((p, i) => (
+        <span
+          key={i}
+          aria-hidden="true"
+          className="absolute select-none pointer-events-none opacity-40 animate-float-petal hidden md:inline-block"
+          style={{
+            top: p.top,
+            left: p.left,
+            fontSize: p.size,
+            animationDuration: `${p.duration}s`,
+            animationDelay: `${p.delay}s`,
+          }}
+        >
+          {p.emoji}
+        </span>
+      ))}
 
       <div className="relative z-10 w-full max-w-7xl mx-auto px-6 md:px-12 pt-20 pb-16 grid md:grid-cols-2 gap-14 items-center">
         {/* Copy */}

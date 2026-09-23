@@ -1,9 +1,29 @@
-import { createContext, useContext, useState, useCallback } from "react";
+import { createContext, useContext, useState, useCallback, useEffect } from "react";
+
+const STORAGE_KEY = "smagyo_cart";
 
 const CartContext = createContext(null);
 
+// Persisted so the cart survives the full-page round-trip to Stripe Checkout
+function loadCart() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (saved && Array.isArray(saved.items)) return saved;
+  } catch { /* storage unavailable or corrupt — start fresh */ }
+  return { items: [], paymentMethod: "PAY_ON_COLLECTION" };
+}
+
 export function CartProvider({ children }) {
-  const [items, setItems] = useState([]);
+  const [initial] = useState(loadCart);
+  const [items, setItems] = useState(initial.items);
+  /** "PAY_ON_COLLECTION" | "STRIPE" */
+  const [paymentMethod, setPaymentMethod] = useState(initial.paymentMethod);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ items, paymentMethod }));
+    } catch { /* ignore — cart just won't persist */ }
+  }, [items, paymentMethod]);
 
   const addItem = useCallback((product) => {
     setItems((prev) => {
@@ -35,7 +55,10 @@ export function CartProvider({ children }) {
 
   return (
     <CartContext.Provider
-      value={{ items, addItem, removeItem, updateQty, clearCart, totalItems, totalPrice }}
+      value={{
+        items, addItem, removeItem, updateQty, clearCart, totalItems, totalPrice,
+        paymentMethod, setPaymentMethod,
+      }}
     >
       {children}
     </CartContext.Provider>

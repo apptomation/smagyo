@@ -1,7 +1,8 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ShoppingCart, Trash2, ArrowRight, Leaf } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
+import PaymentMethodSelector from "../components/ui/PaymentMethodSelector";
 
 const C = {
   charcoal: "#1C1C1C",
@@ -11,9 +12,11 @@ const C = {
 };
 
 export default function CartPage() {
-  const { items, removeItem, updateQty, totalItems, totalPrice } = useCart();
+  const { items, removeItem, updateQty, totalItems, totalPrice, paymentMethod, setPaymentMethod } = useCart();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const paymentCancelled = searchParams.get("payment") === "cancelled";
 
   const handleCheckout = () => {
     if (isAuthenticated) navigate("/checkout");
@@ -59,6 +62,16 @@ export default function CartPage() {
         >
           Your Cart <span className="text-lg font-normal text-gray-400">({totalItems} items)</span>
         </h1>
+
+        {paymentCancelled && (
+          <p
+            role="status"
+            className="text-sm text-amber-800 bg-amber-50 border border-amber-100 px-4 py-3 rounded-xl mb-6"
+            style={{ fontFamily: "'DM Sans', sans-serif" }}
+          >
+            Card payment was cancelled — you haven't been charged. Your cart is still here whenever you're ready.
+          </p>
+        )}
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Items list */}
@@ -139,7 +152,7 @@ export default function CartPage() {
                   <span>${totalPrice.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm" style={{ color: C.sage, fontFamily: "'DM Sans', sans-serif" }}>
-                  <span>Pickup</span>
+                  <span>Pickup or delivery</span>
                   <span className="text-emerald-600 font-medium">Free</span>
                 </div>
                 <div
@@ -149,6 +162,9 @@ export default function CartPage() {
                   <span>Total</span>
                   <span>${totalPrice.toFixed(2)}</span>
                 </div>
+              </div>
+              <div className="mb-5">
+                <PaymentMethodSelector value={paymentMethod} onChange={setPaymentMethod} />
               </div>
               <button
                 onClick={handleCheckout}

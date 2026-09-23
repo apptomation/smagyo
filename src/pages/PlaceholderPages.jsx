@@ -82,18 +82,6 @@ export function PlantsPage() {
   );
 }
 
-export function WishlistPage() {
-  return (
-    <PlaceholderPage
-      title="Your Wishlist"
-      emoji="❤️"
-      description="Save your favourite arrangements here and share them with friends and family."
-      ctaLabel="Browse Bouquets"
-      ctaHref="/bouquets"
-    />
-  );
-}
-
 export function AboutPage() {
   return (
     <PlaceholderPage

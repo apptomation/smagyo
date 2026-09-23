@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import { CartProvider } from "./context/CartContext";
 import { TenantProvider } from "./context/TenantContext";
 import { AuthProvider } from "./context/AuthContext";
+import { WishlistProvider } from "./context/WishlistContext";
 import { AdminAuthProvider } from "./admin/context/AdminAuthContext";
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
@@ -20,14 +21,16 @@ import TenantSettings from "./tenant/pages/TenantSettings";
 import HomePage from "./pages/HomePage";
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
+import CheckoutSuccessPage from "./pages/CheckoutSuccessPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import WishlistPage from "./pages/WishlistPage";
 import {
-  WishlistPage,
   AboutPage,
   NotFoundPage,
 } from "./pages/PlaceholderPages";
 import ShopPage from "./pages/ShopPage";
+import AnimationPOC from "./pages/AnimationPOC";
 
 function StorefrontLayout({ children }) {
   return (
@@ -75,18 +78,23 @@ function App() {
           </Route>
         </Route>
 
+        {/* ── Animation POC (standalone, no storefront chrome) ── */}
+        <Route path="/poc/animation" element={<AnimationPOC />} />
+
         {/* ── Customer-facing storefront ── */}
         <Route
           path="*"
           element={
             <TenantProvider>
               <AuthProvider>
+              <WishlistProvider>
               <CartProvider>
                 <StorefrontLayout>
                 <Routes>
                   <Route path="/" element={<HomePage />} />
                   <Route path="/cart" element={<CartPage />} />
                   <Route path="/checkout" element={<CheckoutPage />} />
+                  <Route path="/checkout/success" element={<CheckoutSuccessPage />} />
                   <Route path="/register" element={<RegisterPage />} />
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/occasions" element={<ShopPage title="Shop by Occasion" />} />
@@ -101,6 +109,7 @@ function App() {
                 </Routes>
               </StorefrontLayout>
             </CartProvider>
+            </WishlistProvider>
             </AuthProvider>
             </TenantProvider>
           }
